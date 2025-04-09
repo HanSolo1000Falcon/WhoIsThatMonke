@@ -21,9 +21,7 @@ namespace WhoIsThatMonke.Handlers
         void Start()
         {
             if (firstPersonNameTag == null || thirdPersonNameTag == null)
-            {
                 CreateColorTags();
-            }
         }
 
         private string GetColorCode(VRRig rig)
@@ -44,24 +42,8 @@ namespace WhoIsThatMonke.Handlers
 
                 fpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 fpTag.name = "FP Color Holder";
-                fpTag.transform.SetParent(firstPersonNameTag.transform);
-                fpTag.transform.localPosition = new Vector3(0f, 4f, 0f);
-                fpTag.transform.localScale = Vector3.one;
-                fpTag.transform.localRotation = Quaternion.Euler(0, 180, 0);
-                fpTag.layer = firstPersonNameTag.layer;
-
-                Destroy(fpTag.GetComponent<Collider>());
-
-                fpColorRenderer = fpTag.GetComponent<Renderer>();
-                fpColorRenderer.material = new Material(uiShader);
-
-                fpColorText = fpTag.AddComponent<TextMeshPro>();
-                fpColorText.alignment = TextAlignmentOptions.Center;
-                fpColorText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                fpColorText.font = nameTagHandler.rig.playerText1.font;
-                fpColorText.fontSize = 7;
-                fpColorText.text = GetColorCode(nameTagHandler.rig);
-                fpColorText.color = nameTagHandler.rig.mainSkin.material.color;
+                
+                fpColorRenderer, fpColorText = TagManager.InitTag(fpTag, firstPersonNameTag);
             }
 
             if (thirdPersonNameTag == null)
@@ -71,39 +53,25 @@ namespace WhoIsThatMonke.Handlers
 
                 tpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 tpTag.name = "TP Color Holder";
-                tpTag.transform.SetParent(thirdPersonNameTag.transform);
-                tpTag.transform.localPosition = new Vector3(0f, 4f, 0f);
-                tpTag.transform.localScale = Vector3.one;
-                tpTag.transform.localRotation = Quaternion.Euler(0, 180, 0);
-                tpTag.layer = thirdPersonNameTag.layer;
-
-                Destroy(tpTag.GetComponent<Collider>());
-
-                tpColorRenderer = tpTag.GetComponent<Renderer>();
-                tpColorRenderer.material = new Material(uiShader);
-
-                tpColorText = tpTag.AddComponent<TextMeshPro>();
-                tpColorText.alignment = TextAlignmentOptions.Center;
-                tpColorText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                tpColorText.font = nameTagHandler.rig.playerText1.font;
-                tpColorText.fontSize = 7;
-                tpColorText.text = GetColorCode(nameTagHandler.rig);
-                tpColorText.color = nameTagHandler.rig.mainSkin.material.color;
+                
+                tpColorRenderer, tpColorText = TagManager.InitTag(tpTag, thirdPersonNameTag);
             }
+
             UpdateColorPatchThingy();
         }
 
         void UpdateColorPatchThingy()
         {
             if (fpColorText != null)
-            {
                 fpColorText.text = GetColorCode(nameTagHandler.rig);
-            }
 
             if (tpColorText != null)
-            {
                 tpColorText.text = GetColorCode(nameTagHandler.rig);
-            }
+        }
+
+        private void UpdateTagLocalPosition(GameObject tag1, GameObject tag2, Vector3 newV) {
+            tag1.transform.localPosition = newV;
+            tag1.transform.localPosition = newV;
         }
 
         void FixedUpdate()
@@ -111,57 +79,31 @@ namespace WhoIsThatMonke.Handlers
             if (nameTagHandler != null)
             {
                 if (fpColorText.text != GetColorCode(nameTagHandler.rig))
-                {
                     fpColorText.text = GetColorCode(nameTagHandler.rig);
-
-                }
+                
                 if (tpColorText.text != GetColorCode(nameTagHandler.rig))
-                {
                     tpColorText.text = GetColorCode(nameTagHandler.rig);
-                }
 
                 if (fpTextRenderer == null)
-                {
                     fpTextRenderer = fpTag.transform.parent.GetComponent<Renderer>();
-                }
+
                 if (fpColorRenderer == null)
-                {
                     fpColorRenderer = fpColorText.GetComponent<Renderer>();
-                }
+                
                 if (tpColorRenderer == null)
-                {
                     tpColorRenderer = tpColorText.GetComponent<Renderer>();
-                }
-                if (isColorCodeEnabled)
-                {
-                    tpColorRenderer.forceRenderingOff = false;
-                    fpColorRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
-                }
-                else
-                {
-                    fpColorRenderer.forceRenderingOff = true;
-                    tpColorRenderer.forceRenderingOff = true;
-                }
+
+                tpColorRenderer.forceRenderingOff = !isColorCodeEnabled;
+                fpColorRenderer.forceRenderingOff = !isColorCodeEnabled;
+
                 if (!isVelocityEnabled && !isFPSEnabled)
-                {
-                    fpTag.transform.localPosition = new Vector3(0f, 2f, 0f);
-                    tpTag.transform.localPosition = new Vector3(0f, 2f, 0f);
-                }
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 2f, 0f));             
                 else if (!isFPSEnabled)
-                {
-                    fpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                    tpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                }
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 3f, 0f));
                 else if (!isVelocityEnabled)
-                {
-                    fpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                    tpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                }
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 3f, 0f));
                 else
-                {
-                    fpTag.transform.localPosition = new Vector3(0f, 4f, 0f);
-                    tpTag.transform.localPosition = new Vector3(0f, 4f, 0f);
-                }
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 4f, 0f));
 
                 fpColorText.color = nameTagHandler.rig.playerColor;
                 tpColorText.color = nameTagHandler.rig.playerColor;

@@ -21,6 +21,7 @@ namespace WhoIsThatMonke.Handlers
         public Shader UIShader = Shader.Find("UI/Default");
         public DateTime whenWasGorillaTagPaidOrSmthIDKOculus = new DateTime(2023, 02, 06), createdDate;
         private string lastName, myUserID = "A48744B93D9A3596", grazeUserID = "42D7D32651E93866", baggZuserID = "9ABD0C174289F58E", monkyUserID = "B1B20DEEEDB71C63";
+        // maybe dont store them like this and just pull them from a JSON or something ^^^^
 
         void Start()
         {
