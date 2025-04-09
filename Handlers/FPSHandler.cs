@@ -20,9 +20,7 @@ namespace WhoIsThatMonke.Handlers
         void Start()
         {
             if (firstPersonNameTag == null || thirdPersonNameTag == null)
-            {
                 CreateVelocityTags();
-            }
         }
 
         public void CreateVelocityTags()
@@ -34,23 +32,8 @@ namespace WhoIsThatMonke.Handlers
 
                 fpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 fpTag.name = "FP Velocity Holder";
-                fpTag.transform.SetParent(firstPersonNameTag.transform);
-                fpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                fpTag.transform.localScale = Vector3.one;
-                fpTag.layer = firstPersonNameTag.layer;
-
-                Destroy(fpTag.GetComponent<Collider>());
-
-                fpFPSRenderer = fpTag.GetComponent<Renderer>();
-                fpFPSRenderer.material = new Material(uiShader);
-
-                fpFPSText = fpTag.AddComponent<TextMeshPro>();
-                fpFPSText.alignment = TextAlignmentOptions.Center;
-                fpFPSText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                fpFPSText.font = nameTagHandler.rig.playerText1.font;
-                fpFPSText.fontSize = 7;
-                fpFPSText.text = "0";
-                fpFPSText.color = nameTagHandler.rig.playerColor;
+                
+                fpFPSRenderer, fpFPSText = TagInitHelp.InitTag(fpTag, firstPersonNameTag);
             }
 
             if (thirdPersonNameTag == null)
@@ -60,24 +43,10 @@ namespace WhoIsThatMonke.Handlers
 
                 tpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 tpTag.name = "TP Velocity Holder";
-                tpTag.transform.SetParent(thirdPersonNameTag.transform);
-                tpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                tpTag.transform.localScale = Vector3.one;
-                tpTag.layer = thirdPersonNameTag.layer;
-
-                Destroy(tpTag.GetComponent<Collider>());
-
-                tpFPSRenderer = tpTag.GetComponent<Renderer>();
-                tpFPSRenderer.material = new Material(uiShader);
-
-                tpFPSText = tpTag.AddComponent<TextMeshPro>();
-                tpFPSText.alignment = TextAlignmentOptions.Center;
-                tpFPSText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                tpFPSText.font = nameTagHandler.rig.playerText1.font;
-                tpFPSText.fontSize = 7;
-                tpFPSText.text = "0";
-                tpFPSText.color = nameTagHandler.rig.playerColor;
+                
+                tpFPSRenderer, tpFPSText = TagInitHelp.InitTag(tpTag, thirdPersonNameTag);
             }
+            
             UpdateVelocityPatchThingy();
         }
 
