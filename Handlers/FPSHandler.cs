@@ -71,27 +71,17 @@ namespace WhoIsThatMonke.Handlers
                 tpFPSText.text = nameTagHandler.rig.fps.ToString() + " FPS";
 
                 if (fpTextRenderer == null)
-                {
                     fpTextRenderer = fpTag.transform.parent.GetComponent<Renderer>();
-                }
+
                 if (fpFPSRenderer == null)
-                {
                     fpFPSRenderer = fpFPSText.GetComponent<Renderer>();
-                }
+
                 if (tpFPSRenderer == null)
-                {
                     tpFPSRenderer = tpFPSText.GetComponent<Renderer>();
-                }
-                if (isFPSEnabled)
-                {
-                    tpFPSRenderer.forceRenderingOff = false;
-                    fpFPSRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
-                }
-                else
-                {
-                    fpFPSRenderer.forceRenderingOff = true;
-                    tpFPSRenderer.forceRenderingOff = true;
-                }
+
+                tpFPSRenderer.forceRenderingOff = !isFPSEnabled;
+                fpFPSRenderer.forceRenderingOff = !isFPSEnabled;
+
                 if (!isVelocityEnabled)
                 {
                     tpTag.transform.localPosition = new Vector3(0f, 2f, 0f);

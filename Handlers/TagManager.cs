@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace WhoIsThatMonke.Handlers {
-    public class TagInitHelp {
+    public class TagManager {
         public static (Renderer, TextMeshPro) InitTag(GameObject tagCreated, GameObject parent) {
             tagCreated.transform.SetParent(parent.transform);
             tagCreated.transform.localPosition = new Vector3(0f, 4f, 0f);

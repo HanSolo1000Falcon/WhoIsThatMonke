@@ -43,7 +43,7 @@ namespace WhoIsThatMonke.Handlers
                 fpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 fpTag.name = "FP Color Holder";
                 
-                fpColorRenderer, fpColorText = TagInitHelp.InitTag(fpTag, firstPersonNameTag);
+                fpColorRenderer, fpColorText = TagManager.InitTag(fpTag, firstPersonNameTag);
             }
 
             if (thirdPersonNameTag == null)
@@ -54,27 +54,24 @@ namespace WhoIsThatMonke.Handlers
                 tpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 tpTag.name = "TP Color Holder";
                 
-                tpColorRenderer, tpColorText = TagInitHelp.InitTag(tpTag, thirdPersonNameTag);
+                tpColorRenderer, tpColorText = TagManager.InitTag(tpTag, thirdPersonNameTag);
             }
+
             UpdateColorPatchThingy();
         }
 
         void UpdateColorPatchThingy()
         {
             if (fpColorText != null)
-            {
                 fpColorText.text = GetColorCode(nameTagHandler.rig);
-            }
 
             if (tpColorText != null)
-            {
                 tpColorText.text = GetColorCode(nameTagHandler.rig);
-            }
         }
 
-        private void UpdateTagLocalPosition(Vector3 newV) {
-            fpTag.transform.localPosition = newV;
-            tpTag.transform.localPosition = newV;
+        private void UpdateTagLocalPosition(GameObject tag1, GameObject tag2, Vector3 newV) {
+            tag1.transform.localPosition = newV;
+            tag1.transform.localPosition = newV;
         }
 
         void FixedUpdate()
@@ -95,26 +92,18 @@ namespace WhoIsThatMonke.Handlers
                 
                 if (tpColorRenderer == null)
                     tpColorRenderer = tpColorText.GetComponent<Renderer>();
-                
-                if (isColorCodeEnabled)
-                {
-                    tpColorRenderer.forceRenderingOff = false;
-                    fpColorRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
-                }
-                else
-                {
-                    fpColorRenderer.forceRenderingOff = true;
-                    tpColorRenderer.forceRenderingOff = true;
-                }
+
+                tpColorRenderer.forceRenderingOff = !isColorCodeEnabled;
+                fpColorRenderer.forceRenderingOff = !isColorCodeEnabled;
 
                 if (!isVelocityEnabled && !isFPSEnabled)
-                    UpdateTagLocalPosition(new Vector3(0f, 2f, 0f));             
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 2f, 0f));             
                 else if (!isFPSEnabled)
-                    UpdateTagLocalPosition(new Vector3(0f, 3f, 0f));
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 3f, 0f));
                 else if (!isVelocityEnabled)
-                    UpdateTagLocalPosition(new Vector3(0f, 3f, 0f));
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 3f, 0f));
                 else
-                    UpdateTagLocalPosition(new Vector3(0f, 4f, 0f));
+                    UpdateTagLocalPosition(fpTag, tpTag, new Vector3(0f, 4f, 0f));
 
                 fpColorText.color = nameTagHandler.rig.playerColor;
                 tpColorText.color = nameTagHandler.rig.playerColor;
