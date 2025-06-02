@@ -141,7 +141,7 @@ namespace WhoIsThatMonke.Handlers
             var accountInfo = await GetAccountCreationDateAsync(userId); 
             createdDate = accountInfo.AccountInfo.Created;
 
-            if (createdDate > whenWasGorillaTagPaidOrSmthIDKOculus) return sta!ndaloneTexture;
+            if (createdDate > whenWasGorillaTagPaidOrSmthIDKOculus) return standaloneTexture;
             return notSureTexture;
         }
 
