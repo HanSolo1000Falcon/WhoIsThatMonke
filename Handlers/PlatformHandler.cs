@@ -135,7 +135,7 @@ namespace WhoIsThatMonke.Handlers
 
             if (knownUserTextures.TryGetValue(userId, out Texture2D knownTexture)) return knownTexture;
             if (concat.Contains("S. FIRST LOGIN")) return steamTexture;
-            if (concat.Contains("FIRST LOGIN") || customPropsCount >= 3) return pcTexture;
+            if (concat.Contains("FIRST LOGIN") || customPropsCount >= 2) return pcTexture;
             if (concat.Contains("LMAKT.")) return standaloneTexture;
 
             var accountInfo = await GetAccountCreationDateAsync(userId);
