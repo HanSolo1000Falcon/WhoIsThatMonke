@@ -305,7 +305,7 @@
     <Reference Include="websocket-sharp">
       <HintPath>$(GameAssemblyPath)\websocket-sharp.dll</HintPath>
     </Reference>
-    <Reference Include="WhoIsTalking" Publicize="true">
+    <Reference Include="WhoIsTalking" Publicize="True">
       <HintPath>$(PluginsPath)\WhoIsTalking\WhoIsTalking.dll</HintPath>
     </Reference>
   </ItemGroup>

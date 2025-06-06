@@ -32,7 +32,8 @@ namespace WhoIsThatMonke.Handlers
             offsetCalculator.AddBool(isVelocityEnabled);
             offsetCalculator.AddBool(isFPSEnabled);
             float offset = offsetCalculator.CalculateOffsetCoolKidz();
-            transform.localPosition = new Vector3(0f, offset, 0f);
+            fpTag.transform.localPosition = new Vector3(0f, offset, 0f);
+            tpTag.transform.localPosition = new Vector3(0f, offset, 0f);
         }
 
         private string GetColorCode(VRRig rig)

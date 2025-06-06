@@ -138,8 +138,8 @@ namespace WhoIsThatMonke.Handlers
             if (concat.Contains("FIRST LOGIN") || customPropsCount >= 2) return pcTexture;
             if (concat.Contains("LMAKT.")) return standaloneTexture;
 
-            var accountInfo = await GetAccountCreationDateAsync(userId);
-            DateTime createdDate = accountInfo.AccountInfo.Created;
+            var accountInfo = await GetAccountCreationDateAsync(userId); 
+            createdDate = accountInfo.AccountInfo.Created;
 
             if (createdDate > whenWasGorillaTagPaidOrSmthIDKOculus) return standaloneTexture;
             return notSureTexture;

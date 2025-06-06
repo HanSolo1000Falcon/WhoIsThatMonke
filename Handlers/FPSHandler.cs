@@ -30,7 +30,8 @@ namespace WhoIsThatMonke.Handlers
             offsetCalculator.ClearBoolsForDaSools();
             offsetCalculator.AddBool(isVelocityEnabled);
             float offset = offsetCalculator.CalculateOffsetCoolKidz();
-            transform.localPosition = new Vector3(0f, offset, 0f);
+            fpTag.transform.localPosition = new Vector3(0f, offset, 0f);
+            tpTag.transform.localPosition = new Vector3(0f, offset, 0f);
         }
 
         public void CreateVelocityTags()
