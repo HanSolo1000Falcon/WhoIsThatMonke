@@ -1,3 +1,4 @@
+using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
 using Photon.Pun;
@@ -13,10 +14,13 @@ namespace WhoIsThatMonke
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BaseUnityPlugin
     {
-        private ConfigEntry<bool> PlatformCheckerEnabled;
-        private ConfigEntry<bool> VelocityCheckerEnabled;
-        private ConfigEntry<bool> FPSCheckerEnabled;
-        private ConfigEntry<bool> ColorCodeSpooferEnabled;
+        public ConfigFile cfg;
+        public ConfigEntry<bool> PlatformCheckerEnabled;
+        public ConfigEntry<bool> VelocityCheckerEnabled;
+        public ConfigEntry<bool> FPSCheckerEnabled;
+        public ConfigEntry<bool> ColorCodeSpooferEnabled;
+        public ConfigEntry<bool> TwoFiveFiveColorCodesEnabled;
+        public static Plugin Instance;
 
         void Start()
         {
@@ -28,11 +32,15 @@ namespace WhoIsThatMonke
 
  	    void Awake()
   	    {
-  	     
-            PlatformCheckerEnabled = Config.Bind("Settings", "Platform Checker", true, "Enable or disable the platform checker.");
-            VelocityCheckerEnabled = Config.Bind("Settings", "Velocity Checker", true, "Enable or disable the velocity checker.");
-            FPSCheckerEnabled = Config.Bind("Settings", "FPS Checker", true, "Enable or disable the FPS checker.");
-            ColorCodeSpooferEnabled = Config.Bind("Settings", "Color Code Spoofer", true, "Enable or disable the color code spoofer.");
+            Instance = this;
+            var cfgPath = Path.Combine(Paths.ConfigPath, "WhoIsThatMonke.cfg");
+  	        cfg = new ConfigFile(cfgPath, true);
+            PlatformCheckerEnabled = cfg.Bind("Settings", "Platform Checker", true, "Enable or disable the platform checker.");
+            VelocityCheckerEnabled = cfg.Bind("Settings", "Velocity Checker", true, "Enable or disable the velocity checker.");
+            FPSCheckerEnabled = cfg.Bind("Settings", "FPS Checker", true, "Enable or disable the FPS checker.");
+            ColorCodeSpooferEnabled = cfg.Bind("Settings", "Color Code Spoofer", true, "Enable or disable the color code spoofer.");
+            TwoFiveFiveColorCodesEnabled = cfg.Bind("Settings", "255 Color Codes", false, "Enable or disable 255 color codes.");
+            
 
             isPlatformEnabled = PlatformCheckerEnabled.Value;
             isVelocityEnabled = VelocityCheckerEnabled.Value;

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using HarmonyLib;
 using UnityEngine;
 using WhoIsTalking;
 using WhoIsThatMonke.Handlers;
 namespace WhoIsThatMonke.Patches
 {
-    [HarmonyPatch(typeof(NameTagHandler))]
-    [HarmonyPatch("GetInfo", MethodType.Normal)]
+    [HarmonyPatch(typeof(NameTagHandler), "RefreshInfo")]
     internal class WhoIsTalkingPatch0
     {
         private static void Postfix(NameTagHandler __instance)
