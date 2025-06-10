@@ -33,7 +33,7 @@ namespace WhoIsThatMonke
  	    void Awake()
   	    {
             Instance = this;
-            var cfgPath = Path.Combine(Paths.ConfigPath, "WhoIsThatMonke.cfg");
+            var cfgPath = Path.Combine(Paths.ConfigPath, "WhoIsThatMonke.cfg" + " " + PluginInfo.Version);
   	        cfg = new ConfigFile(cfgPath, true);
             PlatformCheckerEnabled = cfg.Bind("Settings", "Platform Checker", true, "Enable or disable the platform checker.");
             VelocityCheckerEnabled = cfg.Bind("Settings", "Velocity Checker", true, "Enable or disable the velocity checker.");

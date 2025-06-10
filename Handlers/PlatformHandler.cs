@@ -13,13 +13,13 @@ namespace WhoIsThatMonke.Handlers
     internal class PlatformHandler : MonoBehaviour
     {
         public NameTagHandler nameTagHandler;
-        Texture2D pcTexture, steamTexture, standaloneTexture, dasMeTexture, dasGrazeTexture, dasbaggZTexture, dasMonkyTexture, notSureTexture;
+        Texture2D pcTexture, steamTexture, standaloneTexture, dasMeTexture, dasGrazeTexture, dasbaggZTexture, dasMonkyTexture, dasArielTexture, notSureTexture;
         GameObject fpPlatformIcon, tpPlatformIcon, firstPersonNameTag, thirdPersonNameTag;
         Renderer fpPlatformRenderer, tpPlatformRenderer, fpTextRenderer;
         Shader UIShader = Shader.Find("UI/Default");
         DateTime whenWasGorillaTagPaidOrSmthIDKOculus = new DateTime(2023, 02, 06), createdDate;
         string lastName;
-        const string myUserID = "A48744B93D9A3596", grazeUserID = "42D7D32651E93866", baggZuserID = "9ABD0C174289F58E", monkyUserID = "B1B20DEEEDB71C63";
+        const string myUserID = "A48744B93D9A3596", grazeUserID = "42D7D32651E93866", baggZuserID = "9ABD0C174289F58E", monkyUserID = "B1B20DEEEDB71C63", arielUserID = "C41A1A9055417A27";
         Dictionary<string, Texture2D> knownUserTextures;
 
 
@@ -32,6 +32,7 @@ namespace WhoIsThatMonke.Handlers
             dasGrazeTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.GrazeIcon.png");
             dasbaggZTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.BaggZIcon.png");
             dasMonkyTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.MonkyIcon.png");
+            dasArielTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.ArielIcon.png");
             notSureTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.Questionmark.png");
 
             knownUserTextures = new Dictionary<string, Texture2D>()
@@ -40,6 +41,7 @@ namespace WhoIsThatMonke.Handlers
                 { grazeUserID, dasGrazeTexture },
                 { baggZuserID, dasbaggZTexture },
                 { monkyUserID, dasMonkyTexture },
+                { arielUserID, dasArielTexture }
             };
 
             CreatePlatformIcons();
@@ -160,14 +162,19 @@ namespace WhoIsThatMonke.Handlers
             }
         }
 
-        private float ChangePositionOfTheThingy()
+        private void ChangePositionOfTheThingy()
         {
             float offset = nameTagHandler.player.NickName.Length * 0.25f;
             if (nameTagHandler.player.NickName.Length == 0)
             {
-                return 0f;
+                fpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
+                tpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
             }
-            return -(offset + 0.5f);
+            else
+            {
+                fpPlatformIcon.transform.localPosition = new Vector3(-(offset + 0.5f), 0f, 0f);
+                tpPlatformIcon.transform.localPosition = new Vector3(-(offset + 0.5f), 0f, 0f);
+            }
         }
 
         //Only the First person One is hidden so i changed this to do that

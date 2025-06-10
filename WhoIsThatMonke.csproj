@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\ArielIcon.png" />
     <None Remove="Assets\MetaIcon.png" />
     <None Remove="Assets\PCIcon.png" />
     <None Remove="Assets\ProfilbildGTAG.png" />
@@ -14,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Assets\ArielIcon.png" />
     <EmbeddedResource Include="Assets\MetaIcon.png" />
     <EmbeddedResource Include="Assets\PCIcon.png" />
     <EmbeddedResource Include="Assets\ProfilbildGTAG.png" />
