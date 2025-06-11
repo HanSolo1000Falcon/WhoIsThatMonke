@@ -98,7 +98,7 @@ namespace WhoIsThatMonke.Handlers
                 fpPlatformIcon = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 fpPlatformIcon.name = "FP Platform Icon";
                 fpPlatformIcon.transform.SetParent(firstPersonNameTag.transform);
-                fpPlatformIcon.transform.localPosition = new Vector3(-3f, 0f, 0f);
+                fpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
                 fpPlatformIcon.transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
                 fpPlatformIcon.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
                 fpPlatformIcon.layer = firstPersonNameTag.layer;
@@ -117,7 +117,7 @@ namespace WhoIsThatMonke.Handlers
                 tpPlatformIcon = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 tpPlatformIcon.name = "TP Platform Icon";
                 tpPlatformIcon.transform.SetParent(thirdPersonNameTag.transform);
-                tpPlatformIcon.transform.localPosition = new Vector3(-3.25f, 0f, 0f);
+                tpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
                 tpPlatformIcon.transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
                 tpPlatformIcon.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
                 tpPlatformIcon.layer = thirdPersonNameTag.layer;
@@ -198,7 +198,7 @@ namespace WhoIsThatMonke.Handlers
 
                 if (isPlatformEnabled)
                 {
-                    tpPlatformRenderer.forceRenderingOff = false;
+                    tpPlatformRenderer.forceRenderingOff = tpPlatformIcon.transform.parent.GetComponent<Renderer>().forceRenderingOff;
                     fpPlatformRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
                 }
                 else

@@ -153,7 +153,7 @@ namespace WhoIsThatMonke.Handlers
 
                 if (isVelocityEnabled)
                 {
-                    tpVelocityRenderer.forceRenderingOff = false;
+                    tpVelocityRenderer.forceRenderingOff = tpVelocityText.transform.parent.GetComponent<Renderer>().forceRenderingOff;
                     fpVelocityRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
                 }
                 else

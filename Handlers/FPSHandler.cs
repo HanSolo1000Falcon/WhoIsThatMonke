@@ -124,7 +124,7 @@ namespace WhoIsThatMonke.Handlers
                 }
                 if (isFPSEnabled)
                 {
-                    tpFPSRenderer.forceRenderingOff = false;
+                    tpFPSRenderer.forceRenderingOff = tpFPSText.transform.parent.GetComponent<Renderer>().forceRenderingOff;
                     fpFPSRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
                 }
                 else

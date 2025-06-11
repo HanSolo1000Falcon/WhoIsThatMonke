@@ -162,7 +162,7 @@ namespace WhoIsThatMonke.Handlers
 
                 if (isColorCodeEnabled)
                 {
-                    tpColorRenderer.forceRenderingOff = false;
+                    tpColorRenderer.forceRenderingOff = tpColorText.transform.parent.GetComponent<Renderer>().forceRenderingOff;
                     fpColorRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
                 }
                 else
