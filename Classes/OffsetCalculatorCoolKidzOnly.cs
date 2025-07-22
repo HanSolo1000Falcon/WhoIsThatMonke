@@ -4,17 +4,10 @@ namespace WhoIsThatMonke.Classes
 {
     public class OffsetCalculatorCoolKidzOnly
     {
-        List<bool> boolsForDaSools = new List<bool>();
+        private List<bool> boolsForDaSools = new List<bool>();
 
-        public void AddBool(bool value)
-        {
-            boolsForDaSools.Add(value);
-        }
-
-        public void ClearBoolsForDaSools()
-        {
-            boolsForDaSools.Clear();
-        }
+        public void AddBool(bool value) => boolsForDaSools.Add(value);
+        public void ClearBoolsForDaSools() => boolsForDaSools.Clear();
 
         public float CalculateOffsetCoolKidz()
         {
@@ -22,12 +15,10 @@ namespace WhoIsThatMonke.Classes
             foreach (bool value in boolsForDaSools)
             {
                 if (value)
-                {
                     offset++;
-                }
             }
 
-            return (float)offset;
+            return offset;
         }
     }
 }

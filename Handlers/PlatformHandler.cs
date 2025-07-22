@@ -10,141 +10,145 @@ using System.Threading.Tasks;
 
 namespace WhoIsThatMonke.Handlers
 {
-    internal class PlatformHandler : MonoBehaviour
+    public class PlatformHandler : MonoBehaviour
     {
         public NameTagHandler nameTagHandler;
-        Texture2D pcTexture, steamTexture, standaloneTexture, dasMeTexture, dasGrazeTexture, dasbaggZTexture, dasMonkyTexture, dasArielTexture, notSureTexture;
-        GameObject fpPlatformIcon, tpPlatformIcon, firstPersonNameTag, thirdPersonNameTag;
-        Renderer fpPlatformRenderer, tpPlatformRenderer, fpTextRenderer;
-        Shader UIShader = Shader.Find("UI/Default");
-        DateTime whenWasGorillaTagPaidOrSmthIDKOculus = new DateTime(2023, 02, 06), createdDate;
-        string lastName;
-        const string myUserID = "A48744B93D9A3596", grazeUserID = "42D7D32651E93866", baggZuserID = "9ABD0C174289F58E", monkyUserID = "B1B20DEEEDB71C63", arielUserID = "C41A1A9055417A27";
-        Dictionary<string, Texture2D> knownUserTextures;
 
+        private Texture2D pcTexture, steamTexture, standaloneTexture, notSureTexture;
+        private Texture2D dasMeTexture, dasGrazeTexture, dasbaggZTexture, dasMonkyTexture, dasArielTexture;
 
-        void Start()
+        private GameObject fpPlatformIcon, tpPlatformIcon;
+        private GameObject firstPersonNameTag, thirdPersonNameTag;
+
+        private Renderer fpPlatformRenderer, tpPlatformRenderer;
+        private Renderer fpTextRenderer, tpTextRenderer;
+
+        private Shader UIShader;
+
+        private readonly DateTime oculusThresholdDate = new DateTime(2023, 02, 06);
+        private string lastName;
+
+        private readonly Dictionary<string, Texture2D> knownUserTextures = new();
+
+        private const string myUserID = "A48744B93D9A3596", grazeUserID = "42D7D32651E93866", 
+                             baggZuserID = "9ABD0C174289F58E", monkyUserID = "B1B20DEEEDB71C63", 
+                             arielUserID = "C41A1A9055417A27";
+
+        private void Awake() => UIShader = Shader.Find("UI/Default");
+
+        private void Start()
+        {
+            InitializeTextures();
+            CreatePlatformIcons();
+        }
+
+        private void InitializeTextures()
         {
             pcTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.PCIcon.png");
             steamTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.SteamIcon.png");
             standaloneTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.MetaIcon.png");
+            notSureTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.Questionmark.png");
+
             dasMeTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.ProfilbildGTAG.png");
             dasGrazeTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.GrazeIcon.png");
             dasbaggZTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.BaggZIcon.png");
             dasMonkyTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.MonkyIcon.png");
             dasArielTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.ArielIcon.png");
-            notSureTexture = LoadEmbeddedImage("WhoIsThatMonke.Assets.Questionmark.png");
 
-            knownUserTextures = new Dictionary<string, Texture2D>()
-            {
-                { myUserID, dasMeTexture },
-                { grazeUserID, dasGrazeTexture },
-                { baggZuserID, dasbaggZTexture },
-                { monkyUserID, dasMonkyTexture },
-                { arielUserID, dasArielTexture }
-            };
-
-            CreatePlatformIcons();
-        }
-
-        async Task<GetAccountInfoResult> GetAccountCreationDateAsync(string userID)
-        {
-            var tcs = new TaskCompletionSource<GetAccountInfoResult>();
-
-            PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest
-            {
-                PlayFabId = userID
-            },
-            result => tcs.SetResult(result),
-            error =>
-            {
-                Debug.LogError("Failed to get account info: " + error.ErrorMessage);
-                tcs.SetException(new Exception(error.ErrorMessage));
-            });
-
-            return await tcs.Task;
+            knownUserTextures.Add(myUserID, dasMeTexture);
+            knownUserTextures.Add(grazeUserID, dasGrazeTexture);
+            knownUserTextures.Add(baggZuserID, dasbaggZTexture);
+            knownUserTextures.Add(monkyUserID, dasMonkyTexture);
+            knownUserTextures.Add(arielUserID, dasArielTexture);
         }
 
         private Texture2D LoadEmbeddedImage(string resourcePath)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            using (var stream = assembly.GetManifestResourceStream(resourcePath))
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            if (stream == null)
             {
-                if (stream == null)
-                {
-                    Debug.LogError($"Resource '{resourcePath}' not found.");
-                    return null;
-                }
-
-                byte[] imageData = new byte[stream.Length];
-                stream.Read(imageData, 0, imageData.Length);
-
-                Texture2D texture = new Texture2D(2, 2);
-                texture.LoadImage(imageData);
-
-                return texture;
+                Debug.LogError($"Resource '{resourcePath}' not found.");
+                return null;
             }
+
+            byte[] imageData = new byte[stream.Length];
+            stream.Read(imageData, 0, imageData.Length);
+
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(imageData);
+
+            return texture;
         }
 
-        public void CreatePlatformIcons()
+        private void CreatePlatformIcons()
         {
-            //This is a more officent way to do it than a foreach as i know the child names -Graze
             if (firstPersonNameTag == null)
             {
-                Transform tmpchild0 = transform.FindChildRecursive("First Person NameTag");
-                firstPersonNameTag = tmpchild0.FindChildRecursive("NameTag").gameObject;
-
-                fpPlatformIcon = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                fpPlatformIcon.name = "FP Platform Icon";
-                fpPlatformIcon.transform.SetParent(firstPersonNameTag.transform);
-                fpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
-                fpPlatformIcon.transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
-                fpPlatformIcon.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
-                fpPlatformIcon.layer = firstPersonNameTag.layer;
-
-                Destroy(fpPlatformIcon.GetComponent<Collider>());
-
-                fpPlatformRenderer = fpPlatformIcon.GetComponent<Renderer>();
-                fpPlatformRenderer.material = new Material(UIShader);
+                firstPersonNameTag = transform.FindChildRecursive("First Person NameTag")?.FindChildRecursive("NameTag")?.gameObject;
+                if (firstPersonNameTag != null)
+                    CreateIcon(ref fpPlatformIcon, ref fpPlatformRenderer, firstPersonNameTag);
             }
 
             if (thirdPersonNameTag == null)
             {
-                Transform tmpchild1 = transform.FindChildRecursive("Third Person NameTag");
-                thirdPersonNameTag = tmpchild1.FindChildRecursive("NameTag").gameObject;
-
-                tpPlatformIcon = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                tpPlatformIcon.name = "TP Platform Icon";
-                tpPlatformIcon.transform.SetParent(thirdPersonNameTag.transform);
-                tpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
-                tpPlatformIcon.transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
-                tpPlatformIcon.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
-                tpPlatformIcon.layer = thirdPersonNameTag.layer;
-
-                Destroy(tpPlatformIcon.GetComponent<Collider>());
-
-                tpPlatformRenderer = tpPlatformIcon.GetComponent<Renderer>();
-                tpPlatformRenderer.material = new Material(UIShader);
+                thirdPersonNameTag = transform.FindChildRecursive("Third Person NameTag")?.FindChildRecursive("NameTag")?.gameObject;
+                if (thirdPersonNameTag != null)
+                    CreateIcon(ref tpPlatformIcon, ref tpPlatformRenderer, thirdPersonNameTag);
             }
+
             UpdatePlatformPatchThingy();
         }
 
-        async Task<Texture> GetPlatformTextureAsync(string concat)
+        private void CreateIcon(ref GameObject iconObj, ref Renderer renderer, GameObject parent)
+        {
+            iconObj = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            iconObj.name = $"{(parent == firstPersonNameTag ? "FP" : "TP")} Platform Icon";
+            iconObj.transform.SetParent(parent.transform);
+            iconObj.transform.localPosition = Vector3.zero;
+            iconObj.transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
+            iconObj.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            iconObj.layer = parent.layer;
+
+            Destroy(iconObj.GetComponent<Collider>());
+
+            renderer = iconObj.GetComponent<Renderer>();
+            renderer.material = new Material(UIShader);
+        }
+
+        private async Task<GetAccountInfoResult> GetAccountCreationDateAsync(string userID)
+        {
+            var tcs = new TaskCompletionSource<GetAccountInfoResult>();
+
+            PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest { PlayFabId = userID },
+                result => tcs.SetResult(result),
+                error =>
+                {
+                    Debug.LogError("Failed to get account info: " + error.ErrorMessage);
+                    tcs.SetException(new Exception(error.ErrorMessage));
+                });
+
+            return await tcs.Task;
+        }
+
+        private async Task<Texture> GetPlatformTextureAsync(string concat)
         {
             string userId = nameTagHandler.player.UserId;
-            int customPropsCount = nameTagHandler.player.GetPlayerRef().CustomProperties.Count;
+            int propCount = nameTagHandler.player.GetPlayerRef().CustomProperties.Count;
 
-            if (knownUserTextures.TryGetValue(userId, out Texture2D knownTexture)) return knownTexture;
+            if (knownUserTextures.TryGetValue(userId, out Texture2D known)) return known;
             if (concat.Contains("S. FIRST LOGIN")) return steamTexture;
-            if (concat.Contains("FIRST LOGIN") || customPropsCount >= 2) return pcTexture;
+            if (concat.Contains("FIRST LOGIN") || propCount > 1) return pcTexture;
             if (concat.Contains("LMAKT.")) return standaloneTexture;
 
-            var accountInfo = await GetAccountCreationDateAsync(userId); 
-            createdDate = accountInfo.AccountInfo.Created;
-
-            if (createdDate > whenWasGorillaTagPaidOrSmthIDKOculus) return standaloneTexture;
-            return notSureTexture;
+            try
+            {
+                var accountInfo = await GetAccountCreationDateAsync(userId);
+                return accountInfo.AccountInfo.Created > oculusThresholdDate ? standaloneTexture : notSureTexture;
+            }
+            catch
+            {
+                return notSureTexture;
+            }
         }
 
         public async void UpdatePlatformPatchThingy()
@@ -152,66 +156,46 @@ namespace WhoIsThatMonke.Handlers
             Texture platformTexture = await GetPlatformTextureAsync(nameTagHandler.rig.concatStringOfCosmeticsAllowed);
 
             if (fpPlatformRenderer != null)
-            {
                 fpPlatformRenderer.material.mainTexture = platformTexture;
-            }
 
             if (tpPlatformRenderer != null)
-            {
                 tpPlatformRenderer.material.mainTexture = platformTexture;
-            }
         }
 
         private void ChangePositionOfTheThingy()
         {
-            float offset = nameTagHandler.player.NickName.Length * 0.25f;
-            if (nameTagHandler.player.NickName.Length == 0)
-            {
-                fpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
-                tpPlatformIcon.transform.localPosition = new Vector3(0f, 0f, 0f);
-            }
-            else
-            {
-                fpPlatformIcon.transform.localPosition = new Vector3(-(offset + 0.5f), 0f, 0f);
-                tpPlatformIcon.transform.localPosition = new Vector3(-(offset + 0.5f), 0f, 0f);
-            }
+            string name = nameTagHandler.player.NickName;
+            float offset = string.IsNullOrEmpty(name) ? 0f : -(name.Length * 0.25f + 0.5f);
+
+            if (fpPlatformIcon != null)
+                fpPlatformIcon.transform.localPosition = new Vector3(offset, 0f, 0f);
+
+            if (tpPlatformIcon != null)
+                tpPlatformIcon.transform.localPosition = new Vector3(offset, 0f, 0f);
         }
 
-        //Only the First person One is hidden so i changed this to do that
-        //no longer have to manualy set rotation etc as it is parented to the nametag Text Obj -Graze
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            if (fpPlatformIcon != null)
+            if (fpPlatformIcon == null || nameTagHandler == null)
+                return;
+
+            fpTextRenderer ??= fpPlatformIcon.transform.parent.GetComponent<Renderer>();
+            tpTextRenderer ??= tpPlatformIcon?.transform.parent.GetComponent<Renderer>();
+            fpPlatformRenderer ??= fpPlatformIcon.GetComponent<Renderer>();
+            tpPlatformRenderer ??= tpPlatformIcon?.GetComponent<Renderer>();
+
+            bool shouldRender = isPlatformEnabled && fpTextRenderer != null && tpTextRenderer != null;
+
+            if (fpPlatformRenderer != null)
+                fpPlatformRenderer.forceRenderingOff = !shouldRender || fpTextRenderer.forceRenderingOff;
+
+            if (tpPlatformRenderer != null)
+                tpPlatformRenderer.forceRenderingOff = !shouldRender || tpTextRenderer.forceRenderingOff;
+
+            if (lastName != nameTagHandler.player.NickName)
             {
-                if (fpTextRenderer == null)
-                {
-                    fpTextRenderer = fpPlatformIcon.transform.parent.GetComponent<Renderer>();
-                }
-                if (fpPlatformRenderer == null)
-                {
-                    fpPlatformRenderer = fpPlatformIcon.GetComponent<Renderer>();
-                }
-                if (tpPlatformRenderer == null)
-                {
-                    tpPlatformRenderer = tpPlatformIcon.GetComponent<Renderer>();
-                }
-
-                if (isPlatformEnabled)
-                {
-                    tpPlatformRenderer.forceRenderingOff = tpPlatformIcon.transform.parent.GetComponent<Renderer>().forceRenderingOff;
-                    fpPlatformRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
-                }
-                else
-                {
-                    fpPlatformRenderer.forceRenderingOff = true;
-                    tpPlatformRenderer.forceRenderingOff = true;
-                }
-
-                if (lastName != nameTagHandler.player.NickName)
-                {
-                    lastName = nameTagHandler.player.NickName;
-                    ChangePositionOfTheThingy();
-                }
+                lastName = nameTagHandler.player.NickName;
+                ChangePositionOfTheThingy();
             }
         }
     }

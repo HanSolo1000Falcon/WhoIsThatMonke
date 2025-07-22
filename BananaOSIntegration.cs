@@ -8,10 +8,7 @@ namespace BananaOS.Pages
     {
         public override string Title => "WhoIsThatMonke";
         public override bool DisplayOnMainMenu => true;
-        public override void OnPostModSetup()
-        {
-            selectionHandler.maxIndex = 4;
-        }
+        public override void OnPostModSetup() => selectionHandler.maxIndex = 4;
 
         public override string OnGetScreenContent()
         {
@@ -25,10 +22,7 @@ namespace BananaOS.Pages
             return stringBuilder.ToString();
         }
 
-        public static string GetTheEnabled(bool varvar)
-        {
-            return varvar ? "Enabled" : "Disabled";
-        }
+        public static string GetTheEnabled(bool varvar) => varvar ? "Enabled" : "Disabled";
 
         public override void OnButtonPressed(WatchButtonType buttonType)
         {
@@ -79,21 +73,14 @@ namespace BananaOS.Pages
                     break;
             }
         }
-        public static void SendNotification(string message)
-        {
-            BananaNotifications.DisplayNotification(message, Color.yellow, Color.white, 0.8f);
-        }
+        public static void SendNotification(string message) => BananaNotifications.DisplayNotification(message, Color.yellow, Color.white, 0.8f);
     }
 
     public class SettingoPago : WatchPage
     {
         public override string Title => "Who cares?";
         public override bool DisplayOnMainMenu => false;
-
-        public override void OnPostModSetup()
-        {
-            selectionHandler.maxIndex = 0;
-        }
+        public override void OnPostModSetup() => selectionHandler.maxIndex = 0;
 
         public override string OnGetScreenContent()
         {

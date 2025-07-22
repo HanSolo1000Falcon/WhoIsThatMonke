@@ -2,7 +2,7 @@
 
 namespace WhoIsThatMonke
 {
-    internal class PublicVariablesGatherHere
+    public class PublicVariablesGatherHere
     {
         // Backing fields
             // Module bools

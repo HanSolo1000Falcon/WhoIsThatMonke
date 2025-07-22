@@ -6,7 +6,6 @@ using static WhoIsThatMonke.PublicVariablesGatherHere;
 
 namespace WhoIsThatMonke
 {
-    // This is your mod's main class.
     [BepInIncompatibility("com.hansolo1000falcon.gorillatag.whatisthefps")]
     [BepInIncompatibility("com.hansolo1000falcon.gorillatag.whoischeating")]
     [BepInIncompatibility("com.hansolo1000falcon.gorillatag.whoisspeeding")]
@@ -14,25 +13,27 @@ namespace WhoIsThatMonke
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BaseUnityPlugin
     {
+        public static Plugin Instance;
+        
         public ConfigFile cfg;
         public ConfigEntry<bool> PlatformCheckerEnabled;
         public ConfigEntry<bool> VelocityCheckerEnabled;
         public ConfigEntry<bool> FPSCheckerEnabled;
         public ConfigEntry<bool> ColorCodeSpooferEnabled;
         public ConfigEntry<bool> TwoFiveFiveColorCodesEnabled;
-        public static Plugin Instance;
 
-        void Start()
+        private void Start()
         {
             HarmonyPatches.ApplyHarmonyPatches();
             ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable();
-            properties.Add("cheese is gouda", PluginInfo.Name + " " + PluginInfo.Version);
+            properties.Add("cheese is gouda", PluginInfo.Name + ": " + PluginInfo.Version);
             PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
         }
 
- 	    void Awake()
+ 	    private void Awake()
   	    {
             Instance = this;
+            
             var cfgPath = Path.Combine(Paths.ConfigPath, "WhoIsThatMonke.cfg");
   	        cfg = new ConfigFile(cfgPath, true);
             PlatformCheckerEnabled = cfg.Bind("Settings", "Platform Checker", true, "Enable or disable the platform checker.");

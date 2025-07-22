@@ -6,137 +6,110 @@ using WhoIsThatMonke.Classes;
 
 namespace WhoIsThatMonke.Handlers
 {
-    internal class FPSHandler : MonoBehaviour
+    public class FPSHandler : MonoBehaviour
     {
         public NameTagHandler nameTagHandler;
-        GameObject fpTag, tpTag, firstPersonNameTag, thirdPersonNameTag;
-        Renderer fpTextRenderer, fpFPSRenderer, tpFPSRenderer;
-        TextMeshPro fpFPSText, tpFPSText;
-        Shader uiShader = Shader.Find("UI/Default");
-        private OffsetCalculatorCoolKidzOnly offsetCalculator;
 
-        void Start()
+        private GameObject fpTag, tpTag;
+        private GameObject firstPersonNameTag, thirdPersonNameTag;
+        private TextMeshPro fpFPSText, tpFPSText;
+        private Renderer fpFPSRenderer, tpFPSRenderer;
+        private Renderer fpTextRenderer, tpTextRenderer;
+
+        private Shader uiShader;
+        private OffsetCalculatorCoolKidzOnly offsetCalculator = new OffsetCalculatorCoolKidzOnly();
+
+        private void Awake() => uiShader = Shader.Find("UI/Default");
+
+        private void Start()
         {
-            if (firstPersonNameTag == null || thirdPersonNameTag == null)
-            {
-                CreateVelocityTags(); // cooli cool
-            }
-            offsetCalculator = new OffsetCalculatorCoolKidzOnly();
+            CreateVelocityTagsIfNeeded();
             BoolChangedButOnlyTheGoodOnes += CalculateDaOffset;
         }
 
-        void CalculateDaOffset()
-        {
-            offsetCalculator.ClearBoolsForDaSools();
-            offsetCalculator.AddBool(isVelocityEnabled);
-            float offset = offsetCalculator.CalculateOffsetCoolKidz();
-            fpTag.transform.localPosition = new Vector3(0f, offset, 0f);
-            tpTag.transform.localPosition = new Vector3(0f, offset, 0f);
-        }
-
-        public void CreateVelocityTags()
+        private void CreateVelocityTagsIfNeeded()
         {
             if (firstPersonNameTag == null)
             {
-                Transform tmpchild0 = transform.FindChildRecursive("First Person NameTag");
-                firstPersonNameTag = tmpchild0.FindChildRecursive("NameTag").gameObject;
-
-                fpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                fpTag.name = "FP Velocity Holder";
-                fpTag.transform.SetParent(firstPersonNameTag.transform);
-                fpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                fpTag.transform.localScale = Vector3.one;
-                fpTag.layer = firstPersonNameTag.layer;
-
-                Destroy(fpTag.GetComponent<Collider>());
-
-                fpFPSRenderer = fpTag.GetComponent<Renderer>();
-                fpFPSRenderer.material = new Material(uiShader);
-
-                fpFPSText = fpTag.AddComponent<TextMeshPro>();
-                fpFPSText.alignment = TextAlignmentOptions.Center;
-                fpFPSText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                fpFPSText.font = nameTagHandler.rig.playerText1.font;
-                fpFPSText.fontSize = 7;
-                fpFPSText.text = "0";
-                fpFPSText.color = nameTagHandler.rig.playerColor;
+                firstPersonNameTag = transform.FindChildRecursive("First Person NameTag")?.FindChildRecursive("NameTag")?.gameObject;
+                if (firstPersonNameTag != null)
+                    CreateVelocityTag(ref fpTag, ref fpFPSText, ref fpFPSRenderer, firstPersonNameTag);
             }
 
             if (thirdPersonNameTag == null)
             {
-                Transform tmpchild1 = transform.FindChildRecursive("Third Person NameTag");
-                thirdPersonNameTag = tmpchild1.FindChildRecursive("NameTag").gameObject;
-
-                tpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                tpTag.name = "TP Velocity Holder";
-                tpTag.transform.SetParent(thirdPersonNameTag.transform);
-                tpTag.transform.localPosition = new Vector3(0f, 3f, 0f);
-                tpTag.transform.localScale = Vector3.one;
-                tpTag.layer = thirdPersonNameTag.layer;
-
-                Destroy(tpTag.GetComponent<Collider>());
-
-                tpFPSRenderer = tpTag.GetComponent<Renderer>();
-                tpFPSRenderer.material = new Material(uiShader);
-
-                tpFPSText = tpTag.AddComponent<TextMeshPro>();
-                tpFPSText.alignment = TextAlignmentOptions.Center;
-                tpFPSText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                tpFPSText.font = nameTagHandler.rig.playerText1.font;
-                tpFPSText.fontSize = 7;
-                tpFPSText.text = "0";
-                tpFPSText.color = nameTagHandler.rig.playerColor;
+                thirdPersonNameTag = transform.FindChildRecursive("Third Person NameTag")?.FindChildRecursive("NameTag")?.gameObject;
+                if (thirdPersonNameTag != null)
+                    CreateVelocityTag(ref tpTag, ref tpFPSText, ref tpFPSRenderer, thirdPersonNameTag);
             }
-            UpdateVelocityPatchThingy();
+
+            UpdateFPSTexts("0");
         }
 
-        void UpdateVelocityPatchThingy()
+        private void CreateVelocityTag(ref GameObject tagObj, ref TextMeshPro textObj, ref Renderer rendererObj, GameObject parent)
         {
-            if (fpFPSText != null)
-            {
-                fpFPSText.text = "0";
-            }
+            tagObj = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            tagObj.name = $"{(parent == firstPersonNameTag ? "FP" : "TP")} Velocity Holder";
+            tagObj.transform.SetParent(parent.transform);
+            tagObj.transform.localPosition = new Vector3(0f, 3f, 0f);
+            tagObj.transform.localScale = Vector3.one;
+            tagObj.layer = parent.layer;
 
-            if (tpFPSText != null)
-            {
-                tpFPSText.text = "0";
-            }
+            Destroy(tagObj.GetComponent<Collider>());
+
+            rendererObj = tagObj.GetComponent<Renderer>();
+            rendererObj.material = new Material(uiShader);
+
+            textObj = tagObj.AddComponent<TextMeshPro>();
+            textObj.alignment = TextAlignmentOptions.Center;
+            textObj.transform.rotation = Quaternion.Euler(0, 180, 0);
+            textObj.font = nameTagHandler.rig.playerText1.font;
+            textObj.fontSize = 7;
+            textObj.color = nameTagHandler.rig.playerColor;
         }
 
-        void FixedUpdate()
+        private void CalculateDaOffset()
         {
-            if (nameTagHandler != null)
+            offsetCalculator.ClearBoolsForDaSools();
+            offsetCalculator.AddBool(isVelocityEnabled);
+            float offset = offsetCalculator.CalculateOffsetCoolKidz();
+
+            if (fpTag) fpTag.transform.localPosition = new Vector3(0f, offset, 0f);
+            if (tpTag) tpTag.transform.localPosition = new Vector3(0f, offset, 0f);
+        }
+
+        private void UpdateFPSTexts(string fpsText)
+        {
+            if (fpFPSText != null) fpFPSText.text = fpsText;
+            if (tpFPSText != null) tpFPSText.text = fpsText;
+        }
+
+        private void FixedUpdate()
+        {
+            if (nameTagHandler?.rig == null)
+                return;
+
+            string fpsText = $"{nameTagHandler.rig.fps} FPS";
+            UpdateFPSTexts(fpsText);
+
+            fpTextRenderer ??= fpTag?.transform.parent.GetComponent<Renderer>();
+            tpTextRenderer ??= tpTag?.transform.parent.GetComponent<Renderer>();
+            fpFPSRenderer ??= fpFPSText?.GetComponent<Renderer>();
+            tpFPSRenderer ??= tpFPSText?.GetComponent<Renderer>();
+
+            bool shouldRender = isFPSEnabled && fpTextRenderer != null && tpTextRenderer != null;
+
+            if (fpFPSRenderer != null)
+                fpFPSRenderer.forceRenderingOff = !shouldRender || fpTextRenderer.forceRenderingOff;
+
+            if (tpFPSRenderer != null)
+                tpFPSRenderer.forceRenderingOff = !shouldRender || tpTextRenderer.forceRenderingOff;
+
+            if (fpTextRenderer != null)
             {
-                fpFPSText.text = nameTagHandler.rig.fps.ToString() + " FPS";
-                tpFPSText.text = nameTagHandler.rig.fps.ToString() + " FPS";
-
-                if (fpTextRenderer == null)
-                {
-                    fpTextRenderer = fpTag.transform.parent.GetComponent<Renderer>();
-                }
-                if (fpFPSRenderer == null)
-                {
-                    fpFPSRenderer = fpFPSText.GetComponent<Renderer>();
-                }
-                if (tpFPSRenderer == null)
-                {
-                    tpFPSRenderer = tpFPSText.GetComponent<Renderer>();
-                }
-                if (isFPSEnabled)
-                {
-                    tpFPSRenderer.forceRenderingOff = tpFPSText.transform.parent.GetComponent<Renderer>().forceRenderingOff;
-                    fpFPSRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
-                }
-                else
-                {
-                    fpFPSRenderer.forceRenderingOff = true;
-                    tpFPSRenderer.forceRenderingOff = true;
-                }
-
-                Color daRealColor = fpTextRenderer.material.color;
-
-                fpFPSText.color = daRealColor;
-                tpFPSText.color = daRealColor;
+                Color currentColor = fpTextRenderer.material.color;
+                if (fpFPSText != null) fpFPSText.color = currentColor;
+                if (tpFPSText != null) tpFPSText.color = currentColor;
             }
         }
     }

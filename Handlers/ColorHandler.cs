@@ -6,180 +6,142 @@ using static WhoIsThatMonke.PublicVariablesGatherHere;
 
 namespace WhoIsThatMonke.Handlers
 {
-    internal class ColorHandler : MonoBehaviour
+    public class ColorHandler : MonoBehaviour
     {
         public NameTagHandler nameTagHandler;
-        GameObject fpTag, tpTag, firstPersonNameTag, thirdPersonNameTag;
-        Renderer fpTextRenderer, fpColorRenderer, tpColorRenderer;
-        TextMeshPro fpColorText, tpColorText;
-        Shader uiShader = Shader.Find("UI/Default");
-        private OffsetCalculatorCoolKidzOnly offsetCalculator;
 
-        void Start()
+        private GameObject fpTag, tpTag;
+        private GameObject firstPersonNameTag, thirdPersonNameTag;
+
+        private Renderer fpColorRenderer, tpColorRenderer;
+        private Renderer fpTextRenderer, tpTextRenderer;
+
+        private TextMeshPro fpColorText, tpColorText;
+
+        private Shader uiShader;
+        private OffsetCalculatorCoolKidzOnly offsetCalculator = new OffsetCalculatorCoolKidzOnly();
+
+        private void Awake() => uiShader = Shader.Find("UI/Default");
+
+        private void Start()
         {
-            if (firstPersonNameTag == null || thirdPersonNameTag == null)
-            {
-                CreateColorTags();
-            }
-
-            offsetCalculator = new OffsetCalculatorCoolKidzOnly();
+            CreateColorTags();
             BoolChangedButOnlyTheGoodOnes += CalculateDaOffset;
         }
 
-        void CalculateDaOffset()
+        private void CalculateDaOffset()
         {
             offsetCalculator.ClearBoolsForDaSools();
             offsetCalculator.AddBool(isVelocityEnabled);
             offsetCalculator.AddBool(isFPSEnabled);
+
             float offset = offsetCalculator.CalculateOffsetCoolKidz();
-            fpTag.transform.localPosition = new Vector3(0f, offset, 0f);
-            tpTag.transform.localPosition = new Vector3(0f, offset, 0f);
+
+            if (fpTag != null) fpTag.transform.localPosition = new Vector3(0f, offset, 0f);
+            if (tpTag != null) tpTag.transform.localPosition = new Vector3(0f, offset, 0f);
         }
 
         private string GetColorCode(VRRig rig)
         {
-            var color = rig.playerColor;
-            int r, g, b;
+            Color color = rig.playerColor;
+            int multiplier = twoFiftyFiveColorCodes ? 255 : 9;
 
-            if (twoFiftyFiveColorCodes)
-            {
-                r = Mathf.RoundToInt(color.r * 255);
-                g = Mathf.RoundToInt(color.g * 255);
-                b = Mathf.RoundToInt(color.b * 255);
-            }
-            else
-            {
-                r = Mathf.RoundToInt(color.r * 9);
-                g = Mathf.RoundToInt(color.g * 9);
-                b = Mathf.RoundToInt(color.b * 9);
-            }
+            int r = Mathf.RoundToInt(color.r * multiplier);
+            int g = Mathf.RoundToInt(color.g * multiplier);
+            int b = Mathf.RoundToInt(color.b * multiplier);
 
             return $"{r}, {g}, {b}";
         }
 
-        public void CreateColorTags()
+        private void CreateColorTags()
         {
-            if (firstPersonNameTag == null)
-            {
-                Transform tmpchild0 = transform.FindChildRecursive("First Person NameTag");
-                firstPersonNameTag = tmpchild0.FindChildRecursive("NameTag").gameObject;
+            SetupTag(isFirstPerson: true, ref firstPersonNameTag, ref fpTag, ref fpColorRenderer, ref fpColorText, out fpTextRenderer);
 
-                fpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                fpTag.name = "FP Color Holder";
-                fpTag.transform.SetParent(firstPersonNameTag.transform);
-                fpTag.transform.localPosition = new Vector3(0f, 4f, 0f);
-                fpTag.transform.localScale = Vector3.one;
-                fpTag.transform.localRotation = Quaternion.Euler(0, 180, 0);
-                fpTag.layer = firstPersonNameTag.layer;
+            SetupTag(
+                isFirstPerson: false, ref thirdPersonNameTag, ref tpTag, ref tpColorRenderer, ref tpColorText, out tpTextRenderer);
 
-                Destroy(fpTag.GetComponent<Collider>());
-
-                fpColorRenderer = fpTag.GetComponent<Renderer>();
-                fpColorRenderer.material = new Material(uiShader);
-
-                fpColorText = fpTag.AddComponent<TextMeshPro>();
-                fpColorText.alignment = TextAlignmentOptions.Center;
-                fpColorText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                fpColorText.font = nameTagHandler.rig.playerText1.font;
-                fpColorText.fontSize = 7;
-                fpColorText.text = GetColorCode(nameTagHandler.rig);
-                fpColorText.color = nameTagHandler.rig.mainSkin.material.color;
-            }
-
-            if (thirdPersonNameTag == null)
-            {
-                Transform tmpchild1 = transform.FindChildRecursive("Third Person NameTag");
-                thirdPersonNameTag = tmpchild1.FindChildRecursive("NameTag").gameObject;
-
-                tpTag = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                tpTag.name = "TP Color Holder";
-                tpTag.transform.SetParent(thirdPersonNameTag.transform);
-                tpTag.transform.localPosition = new Vector3(0f, 4f, 0f);
-                tpTag.transform.localScale = Vector3.one;
-                tpTag.transform.localRotation = Quaternion.Euler(0, 180, 0);
-                tpTag.layer = thirdPersonNameTag.layer;
-
-                Destroy(tpTag.GetComponent<Collider>());
-
-                tpColorRenderer = tpTag.GetComponent<Renderer>();
-                tpColorRenderer.material = new Material(uiShader);
-
-                tpColorText = tpTag.AddComponent<TextMeshPro>();
-                tpColorText.alignment = TextAlignmentOptions.Center;
-                tpColorText.transform.rotation = Quaternion.Euler(0, 180, 0);
-                tpColorText.font = nameTagHandler.rig.playerText1.font;
-                tpColorText.fontSize = 7;
-                tpColorText.text = GetColorCode(nameTagHandler.rig);
-                tpColorText.color = nameTagHandler.rig.mainSkin.material.color;
-            }
-
-            UpdateColorPatchThingy();
+            UpdateColorPatchText();
         }
 
-        void UpdateColorPatchThingy()
+        private void SetupTag(bool isFirstPerson, ref GameObject nameTag, ref GameObject tagObject, ref Renderer colorRenderer, ref TextMeshPro colorText, out Renderer textRenderer)
         {
-            if (fpColorText != null)
+            string parentName = isFirstPerson ? "First Person NameTag" : "Third Person NameTag";
+            Transform parent = transform.FindChildRecursive(parentName)?.FindChildRecursive("NameTag");
+
+            if (parent == null)
             {
-                fpColorText.text = GetColorCode(nameTagHandler.rig);
+                textRenderer = null;
+                return;
             }
+
+            nameTag = parent.gameObject;
+
+            tagObject = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            tagObject.name = (isFirstPerson ? "FP" : "TP") + " Color Holder";
+            tagObject.transform.SetParent(nameTag.transform);
+            tagObject.transform.localPosition = new Vector3(0f, 4f, 0f);
+            tagObject.transform.localScale = Vector3.one;
+            tagObject.transform.localRotation = Quaternion.Euler(0, 180, 0);
+            tagObject.layer = nameTag.layer;
+
+            Destroy(tagObject.GetComponent<Collider>());
+
+            colorRenderer = tagObject.GetComponent<Renderer>();
+            colorRenderer.material = new Material(uiShader);
+
+            colorText = tagObject.AddComponent<TextMeshPro>();
+            colorText.alignment = TextAlignmentOptions.Center;
+            colorText.transform.rotation = Quaternion.Euler(0, 180, 0);
+            colorText.font = nameTagHandler.rig.playerText1.font;
+            colorText.fontSize = 7;
+            colorText.text = GetColorCode(nameTagHandler.rig);
+            colorText.color = nameTagHandler.rig.mainSkin.material.color;
+
+            textRenderer = parent.GetComponent<Renderer>();
+        }
+
+        private void UpdateColorPatchText()
+        {
+            string colorCode = GetColorCode(nameTagHandler.rig);
+
+            if (fpColorText != null)
+                fpColorText.text = colorCode;
 
             if (tpColorText != null)
-            {
-                tpColorText.text = GetColorCode(nameTagHandler.rig);
-            }
+                tpColorText.text = colorCode;
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            if (nameTagHandler != null)
+            if (nameTagHandler == null) return;
+
+            string currentColorCode = GetColorCode(nameTagHandler.rig);
+
+            if (fpColorText != null && fpColorText.text != currentColorCode)
+                fpColorText.text = currentColorCode;
+
+            if (tpColorText != null && tpColorText.text != currentColorCode)
+                tpColorText.text = currentColorCode;
+
+            if (isColorCodeEnabled)
             {
-                string currentColorCode = GetColorCode(nameTagHandler.rig);
-
-                if (fpColorText.text != currentColorCode)
-                {
-                    fpColorText.text = currentColorCode;
-                }
-
-                if (tpColorText.text != currentColorCode)
-                {
-                    tpColorText.text = currentColorCode;
-                }
-
-                if (fpTextRenderer == null)
-                {
-                    fpTextRenderer = fpTag.transform.parent.GetComponent<Renderer>();
-                }
-
-                if (fpColorRenderer == null)
-                {
-                    fpColorRenderer = fpColorText.GetComponent<Renderer>();
-                }
-
-                if (tpColorRenderer == null)
-                {
-                    tpColorRenderer = tpColorText.GetComponent<Renderer>();
-                }
-
-                if (isColorCodeEnabled)
-                {
-                    tpColorRenderer.forceRenderingOff = tpColorText.transform.parent.GetComponent<Renderer>().forceRenderingOff;
+                if (fpColorRenderer != null && fpTextRenderer != null)
                     fpColorRenderer.forceRenderingOff = fpTextRenderer.forceRenderingOff;
-                }
-                else
-                {
-                    fpColorRenderer.forceRenderingOff = true;
-                    tpColorRenderer.forceRenderingOff = true;
-                }
 
-                Color daRealColor = fpTextRenderer.material.color;
+                if (tpColorRenderer != null && tpTextRenderer != null)
+                    tpColorRenderer.forceRenderingOff = tpTextRenderer.forceRenderingOff;
+            }
+            else
+            {
+                if (fpColorRenderer != null) fpColorRenderer.forceRenderingOff = true;
+                if (tpColorRenderer != null) tpColorRenderer.forceRenderingOff = true;
+            }
 
-                fpColorText.color = daRealColor;
-                tpColorText.color = daRealColor;
-
-                if (nameTagHandler.rig.mainSkin.material.color != nameTagHandler.rig.playerColor)
-                {
-                    nameTagHandler.rig.mainSkin.material.color = nameTagHandler.rig.playerColor;
-                }
+            if (fpTextRenderer != null)
+            {
+                Color actualColor = fpTextRenderer.material.color;
+                if (fpColorText != null) fpColorText.color = actualColor;
+                if (tpColorText != null) tpColorText.color = actualColor;
             }
         }
     }
