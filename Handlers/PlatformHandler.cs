@@ -138,7 +138,6 @@ namespace WhoIsThatMonke.Handlers
             if (knownUserTextures.TryGetValue(userId, out Texture2D known)) return known;
             if (concat.Contains("S. FIRST LOGIN")) return steamTexture;
             if (concat.Contains("FIRST LOGIN") || propCount > 1) return pcTexture;
-            if (concat.Contains("LMAKT.")) return standaloneTexture;
 
             try
             {
