@@ -20,13 +20,9 @@
     <EmbeddedResource Include="Assets\PCIcon.png" />
     <EmbeddedResource Include="Assets\ProfilbildGTAG.png" />
     <EmbeddedResource Include="Assets\SteamIcon.png" />
-    <None Remove="Assets\Questionmark.png" />
     <EmbeddedResource Include="Assets\Questionmark.png" />
-    <None Remove="Assets\MonkyIcon.png" />
     <EmbeddedResource Include="Assets\MonkyIcon.png" />
-    <None Remove="Assets\GrazeIcon.png" />
     <EmbeddedResource Include="Assets\GrazeIcon.png" />
-    <None Remove="Assets\BaggZIcon.png" />
     <EmbeddedResource Include="Assets\BaggZIcon.png" />
   </ItemGroup>
 

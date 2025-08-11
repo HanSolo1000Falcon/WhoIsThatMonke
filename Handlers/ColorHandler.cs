@@ -95,7 +95,7 @@ namespace WhoIsThatMonke.Handlers
             colorText.font = nameTagHandler.rig.playerText1.font;
             colorText.fontSize = 7;
             colorText.text = GetColorCode(nameTagHandler.rig);
-            colorText.color = nameTagHandler.rig.mainSkin.material.color;
+            colorText.color = nameTagHandler.rig.playerColor;
 
             textRenderer = parent.GetComponent<Renderer>();
         }
